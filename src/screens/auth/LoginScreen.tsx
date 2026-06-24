@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Image, ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../../context/AuthContext';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -44,7 +44,10 @@ export default function LoginScreen({ navigation }: Props) {
   };
 
   return (
-    <View style={styles.container}>
+    <ImageBackground 
+      source={require('../../../assets/images/splash_bg_new.png')} 
+      style={styles.container}
+    >
       <Image 
         source={require('../../../assets/images/logo.png')} 
         style={styles.logo}
@@ -106,7 +109,7 @@ export default function LoginScreen({ navigation }: Props) {
       >
         <Text style={styles.linkText}>Don't have an account? Sign up</Text>
       </TouchableOpacity>
-    </View>
+    </ImageBackground>
   );
 }
 
@@ -115,7 +118,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: 'center',
-    backgroundColor: '#F5F7FA',
   },
   logo: {
     width: 120,
@@ -126,7 +128,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFF',
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -144,7 +146,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    color: '#555',
+    color: '#FFF',
     marginBottom: 8,
   },
   input: {
@@ -192,7 +194,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   linkText: {
-    color: '#4A90E2',
+    color: '#90CAF9',
     fontSize: 16,
   },
 });

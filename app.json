@@ -4,11 +4,16 @@
     "slug": "wfw",
     "version": "1.0.0",
     "icon": "./assets/images/logo.png",
-    "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ]
+    ],
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -18,7 +23,11 @@
       }
     },
     "android": {
-      "package": "com.adeoluquantum.wfw"
+      "package": "com.adeoluquantum.wfw",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
     }
   }
 }
