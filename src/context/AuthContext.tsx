@@ -32,11 +32,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
+      console.log('Attempting login for:', email);
       const response = await client.post('/auth.php?action=login', { email, password });
+      console.log('Login response:', response.data);
       const data = response.data;
       
-      // Check if API returns a token or just a success flag
-      if (data.token || data.success) {
+      // The backend returns a 200 on success and a user object
+      if (response.status === 200 || data.token || data.success) {
         const tokenToStore = data.token || `fake-token-${Date.now()}`;
         const userToStore = data.user || { email };
         
@@ -50,22 +52,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       return { success: false, message: data.message || 'Login failed' };
     } catch (error: any) {
-      console.error(error);
+      console.error('Login Error Details:', error.response?.data || error.message);
       return { success: false, message: error.response?.data?.message || 'Network error occurred' };
     }
   };
 
   const register = async (name: string, email: string, password: string) => {
     try {
+      console.log('Attempting registration for:', email);
       const response = await client.post('/auth.php?action=register', { 
         username: email.split('@')[0], // Automatically generate a username
         full_name: name, 
         email, 
         password 
       });
+      console.log('Registration response:', response.data);
       const data = response.data;
       
-      if (data.token || data.success) {
+      // The backend returns a 201 on success
+      if (response.status === 201 || data.token || data.success) {
         const tokenToStore = data.token || `fake-token-${Date.now()}`;
         const userToStore = data.user || { name, email };
         
@@ -79,8 +84,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       return { success: false, message: data.message || 'Registration failed' };
     } catch (error: any) {
-      console.error(error);
-      return { success: false, message: error.response?.data?.message || 'Network error occurred' };
+      console.error('Registration Error Details:', error.response?.data || error.message);
+      return { success: false, message: error.response?.data?.message || error.message || 'Network error occurred' };
     }
   };
 
