@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "wfw",
+    "slug": "wfw",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "3cd05dc1-1a50-4745-88ba-744fe8f85866"
+      }
+    },
+    "android": {
+      "package": "com.adeoluquantum.wfw"
+    }
+  }
+}
