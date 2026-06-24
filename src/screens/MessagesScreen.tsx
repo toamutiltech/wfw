@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ActivityIndicator, RefreshControl, Image } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import client from '../api/client';
 
@@ -100,7 +100,14 @@ export default function MessagesScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Fellowship Group</Text>
+      <View style={styles.headerContainer}>
+        <Image 
+          source={require('../../assets/images/logo.png')} 
+          style={styles.headerLogo}
+          resizeMode="contain"
+        />
+        <Text style={styles.header}>Fellowship Group</Text>
+      </View>
       
       {hasNewUpdate && (
         <TouchableOpacity style={styles.updateBanner} onPress={applyUpdate}>
@@ -145,13 +152,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F5F5',
   },
-  header: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 16,
     backgroundColor: '#FFF',
     borderBottomWidth: 1,
     borderBottomColor: '#EEE',
+  },
+  headerLogo: {
+    width: 32,
+    height: 32,
+    marginRight: 10,
+  },
+  header: {
+    fontSize: 20,
+    fontWeight: 'bold',
     color: '#333',
   },
   listContent: {

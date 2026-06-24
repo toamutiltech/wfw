@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Alert, Modal, TextInput, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Alert, Modal, TextInput, RefreshControl, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import client from '../api/client';
@@ -140,7 +140,14 @@ export default function PrayerBoardScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Prayer Board</Text>
+      <View style={styles.headerContainer}>
+        <Image 
+          source={require('../../assets/images/logo.png')} 
+          style={styles.headerLogo}
+          resizeMode="contain"
+        />
+        <Text style={styles.header}>Prayer Board</Text>
+      </View>
 
       {hasNewUpdate && (
         <TouchableOpacity style={styles.updateBanner} onPress={applyUpdate}>
@@ -226,7 +233,17 @@ export default function PrayerBoardScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: '#F5F5F5' },
-  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 16, color: '#333' },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  headerLogo: {
+    width: 40,
+    height: 40,
+    marginRight: 10,
+  },
+  header: { fontSize: 24, fontWeight: 'bold', color: '#333' },
   card: {
     backgroundColor: '#FFF', padding: 16, borderRadius: 8, marginBottom: 12,
     borderLeftWidth: 4, borderLeftColor: '#4A90E2', elevation: 2,

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Alert, RefreshControl, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Alert, RefreshControl, TouchableOpacity, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import client from '../api/client';
@@ -95,7 +95,14 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Daily Devotionals</Text>
+      <View style={styles.headerContainer}>
+        <Image 
+          source={require('../../assets/images/logo.png')} 
+          style={styles.headerLogo}
+          resizeMode="contain"
+        />
+        <Text style={styles.header}>Daily Devotionals</Text>
+      </View>
 
       {hasNewUpdate && (
         <TouchableOpacity style={styles.updateBanner} onPress={applyUpdate}>
@@ -126,10 +133,19 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#F5F5F5',
   },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  headerLogo: {
+    width: 40,
+    height: 40,
+    marginRight: 10,
+  },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 16,
     color: '#333',
   },
   card: {

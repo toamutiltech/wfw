@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, ActivityIndicator, useColorScheme, Platform, Alert } from 'react-native';
+import { View, ActivityIndicator, useColorScheme, Platform, Alert, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
@@ -125,8 +125,12 @@ function NavigationWrapper() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#4A90E2" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff' }}>
+        <Image 
+          source={require('./assets/images/splash.png')} 
+          style={{ width: '80%', height: '80%' }} 
+          resizeMode="contain" 
+        />
       </View>
     );
   }
