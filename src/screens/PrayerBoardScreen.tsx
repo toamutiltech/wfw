@@ -82,7 +82,7 @@ export default function PrayerBoardScreen() {
     try {
       await client.post('/prayers.php?action=interact', {
         prayer_id: prayerId,
-        user_id: user.id || 1, // Fallback if user.id is missing
+        user_id: user.id,
       });
       Alert.alert('Amen!', 'Your prayer has been recorded.');
       fetchPrayers(); 
@@ -102,7 +102,7 @@ export default function PrayerBoardScreen() {
       await client.post('/prayers.php?action=create', {
         title: newTitle,
         description: newDescription,
-        user_id: user?.id || 1,
+        user_id: user?.id,
       });
       
       Alert.alert('Success', 'Your prayer request has been shared.');
@@ -123,10 +123,10 @@ export default function PrayerBoardScreen() {
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.description}>{item.description}</Text>
       <View style={styles.footer}>
-        <Text style={styles.author}>Posted by: {item.author_name || 'Anonymous'}</Text>
+        <Text style={styles.author}>Posted by: {item.author_name || item.username || 'Anonymous'}</Text>
         
         <View style={styles.actionRow}>
-          <Text style={styles.countText}>Prayed for {item.prayed_count || 0} times</Text>
+          <Text style={styles.countText}>Prayed for {item.prayed_count ? item.prayed_count : 0} times</Text>
           <TouchableOpacity 
             style={styles.prayButton} 
             onPress={() => handlePrayForThis(item.id)}

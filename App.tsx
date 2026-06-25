@@ -13,6 +13,7 @@ import PrayerBoardScreen from './src/screens/PrayerBoardScreen';
 import EventsScreen from './src/screens/EventsScreen';
 import MessagesScreen from './src/screens/MessagesScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
+import EditProfileScreen from './src/screens/EditProfileScreen';
 
 // Auth Screens
 import LoginScreen from './src/screens/auth/LoginScreen';
@@ -77,6 +78,15 @@ async function scheduleDailyNotification() {
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+function ProfileStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="ProfileMain" component={ProfileScreen} />
+      <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+    </Stack.Navigator>
+  );
+}
+
 function MainTabs() {
   return (
     <Tab.Navigator
@@ -99,7 +109,7 @@ function MainTabs() {
       <Tab.Screen name="Prayers" component={PrayerBoardScreen} />
       <Tab.Screen name="Events" component={EventsScreen} />
       <Tab.Screen name="Messages" component={MessagesScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>
   );
 }

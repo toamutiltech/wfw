@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Switch } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 
-export default function ProfileScreen() {
+export default function ProfileScreen({ navigation }: any) {
   const { user, logout } = useContext(AuthContext);
 
   // In a real app, you'd fetch this from the /users endpoint
@@ -14,6 +14,7 @@ export default function ProfileScreen() {
     bio: user?.bio || 'Walking by faith, not by sight.',
     favorite_scriptures: user?.favorite_scriptures || 'Psalms 23, John 3:16',
     beliefs: user?.beliefs || 'Saved by Grace.',
+    profile_picture: user?.profile_picture || null,
   };
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
@@ -21,12 +22,23 @@ export default function ProfileScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.avatarPlaceholder}>
-          <Text style={styles.avatarText}>{displayUser.full_name.charAt(0)}</Text>
-        </View>
+        {displayUser.profile_picture ? (
+          <Image source={{ uri: displayUser.profile_picture }} style={styles.avatarImage} />
+        ) : (
+          <View style={styles.avatarPlaceholder}>
+            <Text style={styles.avatarText}>{displayUser.full_name.charAt(0).toUpperCase()}</Text>
+          </View>
+        )}
         <Text style={styles.name}>{displayUser.full_name}</Text>
         <Text style={styles.username}>@{displayUser.username}</Text>
         <Text style={styles.location}>📍 {displayUser.location}</Text>
+        
+        <TouchableOpacity 
+          style={styles.editButton}
+          onPress={() => navigation.navigate('EditProfile')}
+        >
+          <Text style={styles.editButtonText}>Edit Profile</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
@@ -95,6 +107,23 @@ const styles = StyleSheet.create({
     fontSize: 40,
     color: '#FFF',
     fontWeight: 'bold',
+  },
+  avatarImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 16,
+  },
+  editButton: {
+    marginTop: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 20,
+  },
+  editButtonText: {
+    color: '#333',
+    fontWeight: '600',
   },
   name: {
     fontSize: 24,
