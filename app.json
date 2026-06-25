@@ -9,10 +9,11 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/splash.png",
-          "resizeMode": "contain",
+          "imageWidth": 200,
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "assetBundlePatterns": [
       "**/*"
@@ -23,7 +24,11 @@
       }
     },
     "android": {
-      "package": "com.adeoluquantum.wfw"
+      "package": "com.adeoluquantum.wfw",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
     }
   }
 }
