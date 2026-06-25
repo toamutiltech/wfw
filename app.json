@@ -23,11 +23,7 @@
       }
     },
     "android": {
-      "package": "com.adeoluquantum.wfw",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+      "package": "com.adeoluquantum.wfw"
     }
   }
 }
