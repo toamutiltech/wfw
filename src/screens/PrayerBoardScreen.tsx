@@ -10,8 +10,6 @@ export default function PrayerBoardScreen() {
   const [prayers, setPrayers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [hasNewUpdate, setHasNewUpdate] = useState(false);
-  const [pendingData, setPendingData] = useState<any[]>([]);
   
   // Modal state
   const [modalVisible, setModalVisible] = useState(false);
@@ -38,12 +36,10 @@ export default function PrayerBoardScreen() {
       const freshPrayers = response.data.prayers || [];
       if (freshPrayers.length > 0 && prayers.length > 0) {
         if (freshPrayers[0].id !== prayers[0].id || freshPrayers.length !== prayers.length) {
-          setPendingData(freshPrayers);
-          setHasNewUpdate(true);
+          setPrayers(freshPrayers);
         }
-      } else if (freshPrayers.length > 0 && prayers.length === 0) {
-        setPendingData(freshPrayers);
-        setHasNewUpdate(true);
+      } else if (freshPrayers.length !== prayers.length) {
+        setPrayers(freshPrayers);
       }
     } catch (error) {
       console.log('Polling error:', error);
@@ -54,7 +50,6 @@ export default function PrayerBoardScreen() {
     try {
       const response = await client.get('/prayers.php');
       setPrayers(response.data.prayers || []);
-      setHasNewUpdate(false);
     } catch (error) {
       console.error('Error fetching prayers:', error);
     } finally {
@@ -67,11 +62,6 @@ export default function PrayerBoardScreen() {
     await fetchPrayers();
     setRefreshing(false);
   };
-  
-  const applyUpdate = () => {
-    setPrayers(pendingData);
-    setHasNewUpdate(false);
-  };
 
   const handlePrayForThis = async (prayerId: number) => {
     if (!user) {
@@ -79,15 +69,24 @@ export default function PrayerBoardScreen() {
       return;
     }
     
+    // Optimistic UI Update
+    setPrayers(currentPrayers => currentPrayers.map(p => {
+      if (p.id === prayerId) {
+        return { ...p, prayed_count: (parseInt(p.prayed_count) || 0) + 1 };
+      }
+      return p;
+    }));
+    
     try {
       await client.post('/prayers.php?action=interact', {
         prayer_id: prayerId,
         user_id: user.id,
       });
-      Alert.alert('Amen!', 'Your prayer has been recorded.');
+      // Re-fetch quietly to ensure data consistency
       fetchPrayers(); 
     } catch (error) {
-      Alert.alert('Notice', 'You have already prayed for this request.');
+      // If error (e.g. already prayed), fetch true state
+      fetchPrayers();
     }
   };
 
@@ -148,12 +147,6 @@ export default function PrayerBoardScreen() {
         />
         <Text style={styles.header}>Prayer Board</Text>
       </View>
-
-      {hasNewUpdate && (
-        <TouchableOpacity style={styles.updateBanner} onPress={applyUpdate}>
-          <Text style={styles.updateBannerText}>⬆️ New prayer requests! Tap to refresh.</Text>
-        </TouchableOpacity>
-      )}
 
       {loading && prayers.length === 0 ? (
         <ActivityIndicator size="large" color="#4A90E2" />
@@ -258,19 +251,6 @@ const styles = StyleSheet.create({
   prayButton: { backgroundColor: '#E8F4F8', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 16 },
   prayButtonText: { color: '#007AFF', fontWeight: '600' },
   empty: { textAlign: 'center', color: '#888', marginTop: 20 },
-  updateBanner: {
-    backgroundColor: '#E8F4F8',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#4A90E2',
-  },
-  updateBannerText: {
-    color: '#4A90E2',
-    fontWeight: 'bold',
-  },
   
   // FAB Styles
   fab: {

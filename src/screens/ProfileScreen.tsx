@@ -1,6 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Switch } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Switch, Alert } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
+import client from '../api/client';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ProfileScreen({ navigation }: any) {
   const { user, logout } = useContext(AuthContext);
@@ -18,6 +20,30 @@ export default function ProfileScreen({ navigation }: any) {
   };
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Delete Account",
+      "Are you sure you want to permanently delete your account? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { 
+          text: "Delete", 
+          style: "destructive",
+          onPress: async () => {
+            if (!user) return;
+            try {
+              await client.delete(`/users.php?id=${user.id}`);
+              Alert.alert("Deleted", "Your account has been deleted.");
+              logout();
+            } catch (error) {
+              Alert.alert("Error", "Failed to delete account. Please try again later.");
+            }
+          }
+        }
+      ]
+    );
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -63,6 +89,26 @@ export default function ProfileScreen({ navigation }: any) {
       </View>
 
       <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Legal & Information</Text>
+        <TouchableOpacity style={styles.linkRow} onPress={() => navigation.navigate('Terms')}>
+          <Text style={styles.linkText}>Terms of Service</Text>
+          <Ionicons name="chevron-forward" size={20} color="#888" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.linkRow} onPress={() => navigation.navigate('Privacy')}>
+          <Text style={styles.linkText}>Privacy Policy</Text>
+          <Ionicons name="chevron-forward" size={20} color="#888" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.linkRow} onPress={() => navigation.navigate('FAQ')}>
+          <Text style={styles.linkText}>FAQ</Text>
+          <Ionicons name="chevron-forward" size={20} color="#888" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.linkRow} onPress={() => navigation.navigate('Contact')}>
+          <Text style={styles.linkText}>Contact Us</Text>
+          <Ionicons name="chevron-forward" size={20} color="#888" />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.section}>
         <Text style={styles.sectionTitle}>Settings</Text>
         <View style={styles.settingRow}>
           <Text style={styles.settingText}>Push Notifications</Text>
@@ -76,6 +122,10 @@ export default function ProfileScreen({ navigation }: any) {
         
         <TouchableOpacity style={styles.logoutButton} onPress={logout}>
           <Text style={styles.logoutText}>Log Out</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteAccount}>
+          <Text style={styles.deleteText}>Delete Account</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -194,5 +244,27 @@ const styles = StyleSheet.create({
     color: '#F5222D',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  deleteButton: {
+    marginTop: 16,
+    padding: 16,
+    alignItems: 'center',
+  },
+  deleteText: {
+    color: '#888',
+    fontSize: 14,
+    textDecorationLine: 'underline',
+  },
+  linkRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F5F5F5',
+  },
+  linkText: {
+    fontSize: 16,
+    color: '#4A90E2',
   },
 });

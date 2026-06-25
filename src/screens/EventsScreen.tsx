@@ -11,8 +11,6 @@ export default function EventsScreen() {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [hasNewUpdate, setHasNewUpdate] = useState(false);
-  const [pendingData, setPendingData] = useState<any[]>([]);
 
   // Modal State
   const [modalVisible, setModalVisible] = useState(false);
@@ -43,12 +41,10 @@ export default function EventsScreen() {
       const freshEvents = response.data.events || [];
       if (freshEvents.length > 0 && events.length > 0) {
         if (freshEvents[0].id !== events[0].id || freshEvents.length !== events.length) {
-          setPendingData(freshEvents);
-          setHasNewUpdate(true);
+          setEvents(freshEvents);
         }
-      } else if (freshEvents.length > 0 && events.length === 0) {
-        setPendingData(freshEvents);
-        setHasNewUpdate(true);
+      } else if (freshEvents.length !== events.length) {
+        setEvents(freshEvents);
       }
     } catch (error) {
       console.log('Polling error:', error);
@@ -59,7 +55,6 @@ export default function EventsScreen() {
     try {
       const response = await client.get('/events.php');
       setEvents(response.data.events || []);
-      setHasNewUpdate(false);
     } catch (error) {
       console.error('Error fetching events:', error);
     } finally {
@@ -71,11 +66,6 @@ export default function EventsScreen() {
     setRefreshing(true);
     await fetchEvents();
     setRefreshing(false);
-  };
-  
-  const applyUpdate = () => {
-    setEvents(pendingData);
-    setHasNewUpdate(false);
   };
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
@@ -172,12 +162,6 @@ export default function EventsScreen() {
         />
         <Text style={styles.header}>Fellowship Events</Text>
       </View>
-
-      {hasNewUpdate && (
-        <TouchableOpacity style={styles.updateBanner} onPress={applyUpdate}>
-          <Text style={styles.updateBannerText}>⬆️ New events available! Tap to refresh.</Text>
-        </TouchableOpacity>
-      )}
 
       {loading && events.length === 0 ? (
         <ActivityIndicator size="large" color="#0000ff" />
@@ -385,19 +369,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#888',
     marginTop: 20,
-  },
-  updateBanner: {
-    backgroundColor: '#E8F4F8',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#4A90E2',
-  },
-  updateBannerText: {
-    color: '#4A90E2',
-    fontWeight: 'bold',
   },
   fab: {
     position: 'absolute', width: 60, height: 60, alignItems: 'center', justifyContent: 'center',

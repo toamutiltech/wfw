@@ -13,8 +13,6 @@ export default function MessagesScreen() {
   const [loading, setLoading] = useState(true);
   const [inputText, setInputText] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-  const [hasNewUpdate, setHasNewUpdate] = useState(false);
-  const [pendingData, setPendingData] = useState<any[]>([]);
 
   // Group state
   const [currentGroupId, setCurrentGroupId] = useState(1); // Default Global Fellowship
@@ -53,7 +51,6 @@ export default function MessagesScreen() {
     try {
       const response = await client.get(`/messages.php?group_id=${currentGroupId}`);
       setMessages(response.data.messages || []);
-      setHasNewUpdate(false);
     } catch (error) {
       console.error('Error fetching messages:', error);
     } finally {
@@ -66,9 +63,10 @@ export default function MessagesScreen() {
     try {
       const response = await client.get(`/messages.php?group_id=${currentGroupId}`);
       const newData = response.data.messages || [];
-      if (JSON.stringify(newData) !== JSON.stringify(messages)) {
-        setPendingData(newData);
-        setHasNewUpdate(true);
+      
+      // Auto-update messages silently if there's a difference in length or newest message ID
+      if (newData.length !== messages.length || (newData.length > 0 && messages.length > 0 && newData[0].id !== messages[0].id)) {
+         setMessages(newData);
       }
     } catch (error) {
       console.error('Polling error:', error);
@@ -85,11 +83,6 @@ export default function MessagesScreen() {
   const onRefresh = () => {
     setRefreshing(true);
     fetchMessages();
-  };
-
-  const applyUpdate = () => {
-    setMessages(pendingData);
-    setHasNewUpdate(false);
   };
 
   const handleSend = async () => {
@@ -219,12 +212,6 @@ export default function MessagesScreen() {
         </View>
         <Ionicons name="chevron-down" size={24} color="#FFF" />
       </TouchableOpacity>
-
-      {hasNewUpdate && (
-        <TouchableOpacity style={styles.updateBanner} onPress={applyUpdate}>
-          <Text style={styles.updateBannerText}>New messages! Tap to update.</Text>
-        </TouchableOpacity>
-      )}
 
       <FlatList
         data={messages}
@@ -359,8 +346,6 @@ const styles = StyleSheet.create({
   },
   groupHeaderTitle: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
   groupHeaderSub: { color: 'rgba(255,255,255,0.8)', fontSize: 12 },
-  updateBanner: { backgroundColor: '#E1F5FE', padding: 10, alignItems: 'center' },
-  updateBannerText: { color: '#4A90E2', fontWeight: 'bold' },
   listContent: { padding: 15, paddingBottom: 20 },
   empty: { textAlign: 'center', marginTop: 50, color: '#888', fontStyle: 'italic' },
   
