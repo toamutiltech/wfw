@@ -1,11 +1,20 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Switch, Alert } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { AuthContext } from '../context/AuthContext';
 import client from '../api/client';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function ProfileScreen({ navigation }: any) {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, refreshUser } = useContext(AuthContext);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (user && user.id && refreshUser) {
+        refreshUser(user.id);
+      }
+    }, [user?.id])
+  );
 
   // In a real app, you'd fetch this from the /users endpoint
   const displayUser = {

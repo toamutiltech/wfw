@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useContext } from 'react';
+import React, { useEffect, useState, useCallback, useContext, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ActivityIndicator, RefreshControl, Image, Alert, Modal } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +7,7 @@ import { AuthContext } from '../context/AuthContext';
 
 export default function MessagesScreen() {
   const { user } = useContext(AuthContext);
+  const flatListRef = useRef<FlatList>(null);
   
   // Messaging state
   const [messages, setMessages] = useState<any[]>([]);
@@ -65,7 +66,7 @@ export default function MessagesScreen() {
       const newData = response.data.messages || [];
       
       // Auto-update messages silently if there's a difference in length or newest message ID
-      if (newData.length !== messages.length || (newData.length > 0 && messages.length > 0 && newData[0].id !== messages[0].id)) {
+      if (newData.length !== messages.length || (newData.length > 0 && messages.length > 0 && newData[newData.length - 1].id !== messages[messages.length - 1].id)) {
          setMessages(newData);
       }
     } catch (error) {
@@ -214,6 +215,7 @@ export default function MessagesScreen() {
       </TouchableOpacity>
 
       <FlatList
+        ref={flatListRef}
         data={messages}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
@@ -223,6 +225,16 @@ export default function MessagesScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#4A90E2']} />
         }
         ListEmptyComponent={<Text style={styles.empty}>No messages in {currentGroupName} yet. Say hello!</Text>}
+        onContentSizeChange={() => {
+          if (messages.length > 0) {
+            flatListRef.current?.scrollToEnd({ animated: true });
+          }
+        }}
+        onLayout={() => {
+          if (messages.length > 0) {
+            flatListRef.current?.scrollToEnd({ animated: true });
+          }
+        }}
       />
 
       <View style={styles.inputContainer}>

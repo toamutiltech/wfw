@@ -7,7 +7,7 @@ import client from '../api/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function EditProfileScreen({ navigation }: any) {
-  const { user, login } = useContext(AuthContext); 
+  const { user, login, updateUser } = useContext(AuthContext); 
   
   const [fullName, setFullName] = useState(user?.name || user?.full_name || '');
   const [bio, setBio] = useState(user?.bio || '');
@@ -43,6 +43,7 @@ export default function EditProfileScreen({ navigation }: any) {
     if (!user) return;
     
     setLoading(true);
+
     try {
       const formData = new FormData();
       formData.append('id', user.id);
@@ -71,18 +72,19 @@ export default function EditProfileScreen({ navigation }: any) {
 
       if (response.status === 200) {
         Alert.alert('Success', 'Profile updated successfully!');
-        // Update local user data if possible, then go back
-        const updatedUser = { ...user, full_name: fullName, bio, location, denomination, beliefs, favorite_scriptures };
+        
+        // Update context state and local storage immediately after success
+        const updatedUser = { ...user, name: fullName, full_name: fullName, bio, location, denomination, beliefs, favorite_scriptures: favoriteScriptures };
         if (profileImage) updatedUser.profile_picture = profileImage;
-        await AsyncStorage.setItem('userData', JSON.stringify(updatedUser));
+        await updateUser(updatedUser);
         
         navigation.goBack();
       } else {
-        Alert.alert('Error', 'Failed to update profile.');
+        Alert.alert('Error', 'Failed to sync profile update with server.');
       }
     } catch (error) {
       console.error('Update Profile Error:', error);
-      Alert.alert('Error', 'An error occurred while saving your profile.');
+      Alert.alert('Error', 'Network error while syncing profile update.');
     } finally {
       setLoading(false);
     }

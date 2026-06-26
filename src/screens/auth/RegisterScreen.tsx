@@ -11,6 +11,7 @@ type Props = {
 export default function RegisterScreen({ navigation }: Props) {
   const { register } = useContext(AuthContext);
   const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -27,7 +28,7 @@ export default function RegisterScreen({ navigation }: Props) {
   const handleRegister = async () => {
     setError('');
 
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !username || !email || !password || !confirmPassword) {
       setError('Please fill in all fields.');
       return;
     }
@@ -48,7 +49,7 @@ export default function RegisterScreen({ navigation }: Props) {
     }
 
     setLoading(true);
-    const result = await register(name, email, password);
+    const result = await register(name, username, email, password);
     setLoading(false);
     
     if (!result.success) {
@@ -80,6 +81,20 @@ export default function RegisterScreen({ navigation }: Props) {
             setError('');
           }}
           placeholder="Enter your name"
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Username</Text>
+        <TextInput
+          style={styles.input}
+          value={username}
+          onChangeText={(text) => {
+            setUsername(text.trim());
+            setError('');
+          }}
+          placeholder="Choose a username"
+          autoCapitalize="none"
         />
       </View>
 

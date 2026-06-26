@@ -13,6 +13,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     loadToken();
   }, []);
 
+  const refreshUser = async (userId: string | number) => {
+    try {
+      const response = await client.get(`/users.php?id=${userId}`);
+      if (response.data && response.data.success && response.data.user) {
+        const freshUser = response.data.user;
+        setUser(freshUser);
+        await AsyncStorage.setItem('userData', JSON.stringify(freshUser));
+      }
+    } catch (error) {
+      console.log('Failed to refresh user data from server', error);
+    }
+  };
+
   const loadToken = async () => {
     try {
       const storedToken = await AsyncStorage.getItem('userToken');
@@ -20,7 +33,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (storedToken) {
         setToken(storedToken);
         if (storedUser) {
-          setUser(JSON.parse(storedUser));
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+          // Silently fetch the latest data from the backend so it's not stuck on the saved state
+          if (parsedUser && parsedUser.id) {
+            refreshUser(parsedUser.id);
+          }
         }
       }
     } catch (e) {
@@ -57,11 +75,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (name: string, username: string, email: string, password: string) => {
     try {
       console.log('Attempting registration for:', email);
       const response = await client.post('/auth.php?action=register', { 
-        username: email.split('@')[0], // Automatically generate a username
+        username: username,
         full_name: name, 
         email, 
         password 
@@ -72,7 +90,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // The backend returns a 201 on success
       if (response.status === 201 || data.token || data.success) {
         const tokenToStore = data.token || `fake-token-${Date.now()}`;
-        const userToStore = data.user || { name, email };
+        const userToStore = data.user || { name, username, email };
         
         setToken(tokenToStore);
         setUser(userToStore);
@@ -89,6 +107,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const updateUser = async (newUserData: any) => {
+    setUser(newUserData);
+    await AsyncStorage.setItem('userData', JSON.stringify(newUserData));
+  };
+
   const logout = async () => {
     setToken(null);
     setUser(null);
@@ -97,7 +120,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout, updateUser, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
