@@ -7,7 +7,22 @@ import { Ionicons } from '@expo/vector-icons';
 // import * as Notifications from 'expo-notifications';
 // import * as Device from 'expo-device';
 
+import { logToServer } from './src/utils/logger';
+
+// Set up global error handler
+const defaultErrorHandler = global.ErrorUtils?.getGlobalHandler?.();
+
+global.ErrorUtils?.setGlobalHandler?.((error: any, isFatal?: boolean) => {
+  logToServer(error, { isFatal }, 'FATAL');
+  if (defaultErrorHandler) {
+    defaultErrorHandler(error, isFatal);
+  }
+});
+
 // Import our custom screens
+import FeedScreen from './src/screens/FeedScreen';
+import CreatePostScreen from './src/screens/CreatePostScreen';
+import DiscoverUsersScreen from './src/screens/DiscoverUsersScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import PrayerBoardScreen from './src/screens/PrayerBoardScreen';
 import EventsScreen from './src/screens/EventsScreen';
@@ -104,7 +119,8 @@ function MainTabs() {
         tabBarInactiveTintColor: 'gray',
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
-          if (route.name === 'Devotionals') iconName = focused ? 'book' : 'book-outline';
+          if (route.name === 'Feed') iconName = focused ? 'home' : 'home-outline';
+          else if (route.name === 'Devotionals') iconName = focused ? 'book' : 'book-outline';
           else if (route.name === 'Prayers') iconName = focused ? 'heart' : 'heart-outline';
           else if (route.name === 'Events') iconName = focused ? 'calendar' : 'calendar-outline';
           else if (route.name === 'Messages') iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
@@ -113,12 +129,23 @@ function MainTabs() {
         },
       })}
     >
+      <Tab.Screen name="Feed" component={FeedScreen} />
       <Tab.Screen name="Devotionals" component={HomeScreen} />
       <Tab.Screen name="Prayers" component={PrayerBoardScreen} />
       <Tab.Screen name="Events" component={EventsScreen} />
       <Tab.Screen name="Messages" component={MessagesScreen} />
       <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>
+  );
+}
+
+function MainStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="MainTabs" component={MainTabs} />
+      <Stack.Screen name="CreatePost" component={CreatePostScreen} options={{ presentation: 'modal' }} />
+      <Stack.Screen name="DiscoverUsers" component={DiscoverUsersScreen} />
+    </Stack.Navigator>
   );
 }
 
@@ -155,7 +182,7 @@ function NavigationWrapper() {
 
   return (
     <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      {token ? <MainTabs /> : <AuthStack />}
+      {token ? <MainStack /> : <AuthStack />}
     </NavigationContainer>
   );
 }
